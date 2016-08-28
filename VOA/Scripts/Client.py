@@ -13,6 +13,7 @@ import re
 import sys
 import datetime
 import random
+import pymysql.cursors
 
 logging_path = os.getenv('LOGGING_PATH')
 sys.path.append(logging_path)
@@ -37,30 +38,26 @@ class VoaClient():
         self.log = mylog.get_logger()
         self.log.info("Log create success")
 
-    #构建代理IP池
     def ipList(self):
-        #将所有的url拼出来。
-        url_raw = url = "http://www.mimiip.com/gngao/"
-        urlList = []
-        
-        ipDicts = []
-        session = requests.Session()
-            #添加请求头
-        headers = {'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_0) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.56 Safari/535.11'}
+        connection = pymysql.connect(host='localhost',
+                                     user='hive',
+                                     password='hive',
+                                     db='ScrapyProxy',
+                                     cursorclass=pymysql.cursors.DictCursor)
+        try:
+            with connection.cursor() as cursor:
+                sql = "SELECT ip,port FROM IPProxy"
+                x = cursor.execute(sql)
+                result = cursor.fetchmany(x) 
+                ipList = []
+                for word in result:
+                    for x in word:
+                        ipList.append(word['ip']+":"+word['port'])
+        # print ipList[0:4]
+        finally:
+            connection.close()
 
-        req = session.get(url,headers=headers)
-        bsObj = BeautifulSoup(req.text,"html.parser")
-            # print(bsObj)
-
-        ipField = bsObj.find("table",{"class":"list"}).findAll("tr")
-            # print(ipField)
-            #找出所有的IP和PORT
-        for content in ipField[1:]:
-            ip =   content.find("td",text=re.compile("(\d{1,4}.*)")).text.encode('utf-8')
-            port = content.find("td",text=re.compile("^(\d{1,4})$")).text.encode('utf-8')
-
-            ipDicts.append(ip+":"+port)
-        return ipDicts
+        return ipList
 
     #构建user-agent池
     def userAgent(self):
@@ -92,17 +89,23 @@ class VoaClient():
 
     def urls(self,bsObj):
         """"获取所有类别的文章url"""
-        content = bsObj.find("div",id=re.compile("^(left_nav)$")).findAll("ul")
+        content = bsObj.find("div",id=re.compile("^(right_box)$")).find("div",id={"list"})
         # print(content)
         urls = []
-        i = 0
-        for url in content:
-            if i == 1:
-            	address = url.findAll("a")
-            	for _ in address:
-            	    urls.append(_.attrs['href'])
-            	break
-            else:
-            	i += 1
-            	continue
+        address = content.findAll("a")
+        for _ in address:
+            getone = _.attrs['href']
+            self.log.info("Get one url: "+getone+". \nIt's going on...")
+            urls.append(getone)
+        self.log.info("It's end...")
         return urls
+
+
+    def getContents(self,bsObj):
+        """进入URL，获取所有的语句内容。"""
+        content = bsObj.find("div",id={"content"}).findAll("p")
+        words = []
+        for _ in content:
+            word = _.text
+            words.append(word)
+        return words

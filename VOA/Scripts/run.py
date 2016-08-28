@@ -13,6 +13,5 @@ userAgent = client.userAgent()
 bsObj = client.conn(url,ip,userAgent)
 # print(bsObj)
 urls = client.urls(bsObj)
-for url in urls:
-	url = urlScheme + "://" + urlNet + url
-	print(url)
+    url = urlScheme + "://" + urlNet + url
+    print(url)
