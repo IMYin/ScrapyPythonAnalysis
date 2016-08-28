@@ -1,0 +1,108 @@
+#-*-coding=utf-8-*-
+
+"""
+下载VOA中的文字，存储、自然语言分析。
+"""
+from urlparse import urlparse
+from bs4 import BeautifulSoup
+from requests.exceptions import ProxyError,ConnectionError
+import chardet
+import requests
+import os
+import re
+import sys
+import datetime
+import random
+
+logging_path = os.getenv('LOGGING_PATH')
+sys.path.append(logging_path)
+
+from JobLogging import JobLogging
+
+class VoaClient():
+    """实例化日志输出"""
+    def __init__(self, log_lev = 'INFO'):
+        date_today = datetime.datetime.now().date()
+        log_name = os.path.splitext( os.path.split( sys.argv[0])[1])[0]
+        log_dir = os.getenv('TASK_LOG_PATH_VOA')
+        if  log_dir is None:
+            log_dir = '/home/sunnyin/Project/Python/ProjectOfSelf/VOA/logs'
+        log_dir += '/' + date_today.strftime("%Y%m%d")
+        if not os.path.isdir(log_dir):
+            try:
+                os.makedirs(log_dir)
+            except :
+                pass
+        mylog = JobLogging(log_name,log_dir)
+        self.log = mylog.get_logger()
+        self.log.info("Log create success")
+
+    #构建代理IP池
+    def ipList(self):
+        #将所有的url拼出来。
+        url_raw = url = "http://www.mimiip.com/gngao/"
+        urlList = []
+        
+        ipDicts = []
+        session = requests.Session()
+            #添加请求头
+        headers = {'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_0) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.56 Safari/535.11'}
+
+        req = session.get(url,headers=headers)
+        bsObj = BeautifulSoup(req.text,"html.parser")
+            # print(bsObj)
+
+        ipField = bsObj.find("table",{"class":"list"}).findAll("tr")
+            # print(ipField)
+            #找出所有的IP和PORT
+        for content in ipField[1:]:
+            ip =   content.find("td",text=re.compile("(\d{1,4}.*)")).text.encode('utf-8')
+            port = content.find("td",text=re.compile("^(\d{1,4})$")).text.encode('utf-8')
+
+            ipDicts.append(ip+":"+port)
+        return ipDicts
+
+    #构建user-agent池
+    def userAgent(self):
+        useragent = ['Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_8; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50','Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:2.0.1) Gecko/20100101 Firefox/4.0.1','Opera/9.80 (Macintosh; Intel Mac OS X 10.6.8; U; en) Presto/2.8.131 Version/11.11','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_0) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.56 Safari/535.11']
+        return useragent
+
+    def conn(self,url,ipList,userAgent):
+        proxies = {}
+        headers = {}
+        #在代理ip池内随机抽取一个作为代理ip
+        proxies['http'] = random.choice(ipList)
+        self.log.info("select "+proxies['http']+" as the proxy IP.")
+        headers['User-Agent'] = random.choice(userAgent)
+        self.log.info("select "+headers['User-Agent']+" as the user-agent.")
+        session = requests.Session()
+        # 添加请求头
+
+        try:
+            req = session.get(url,headers=headers,proxies=proxies)
+            bsObj = BeautifulSoup(req.text,"html.parser",from_encoding='utf-8')
+            self.log.info("It connected with the url.")
+            return bsObj
+        except ProxyError as e:
+            self.log.warn("The address is not work,it will try again...\n\n"+str(e.message))
+            self.conn(url,ipList,userAgent)
+        except ConnectionError as e:
+            self.log.warn("The address is not work,it will try again...\n\n"+str(e.message))
+            self.conn(url,ipList,userAgent)
+
+    def urls(self,bsObj):
+        """"获取所有类别的文章url"""
+        content = bsObj.find("div",id=re.compile("^(left_nav)$")).findAll("ul")
+        # print(content)
+        urls = []
+        i = 0
+        for url in content:
+            if i == 1:
+            	address = url.findAll("a")
+            	for _ in address:
+            	    urls.append(_.attrs['href'])
+            	break
+            else:
+            	i += 1
+            	continue
+        return urls

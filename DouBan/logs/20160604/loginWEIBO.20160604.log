@@ -1,0 +1,19 @@
+2016-06-04 23:23:21 [45] INFO Log create success
+2016-06-04 23:26:24 [45] INFO Log create success
+2016-06-04 23:39:04 [45] INFO Log create success
+2016-06-04 23:39:58 [45] INFO Log create success
+2016-06-04 23:41:04 [46] INFO Log create success
+2016-06-04 23:41:04 [133] INFO select http://115.87.217.137:115.87.217.137 as the proxy IP.
+2016-06-04 23:41:04 [133] INFO select http://115.87.217.137:115.87.217.137 as the proxy IP.
+2016-06-04 23:41:04 [136] INFO select Mozilla/5.0 (Windows; U; Windows NT 6.1; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50 as the user-agent.
+2016-06-04 23:41:04 [136] INFO select Mozilla/5.0 (Windows; U; Windows NT 6.1; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50 as the user-agent.
+2016-06-04 23:42:09 [46] INFO Log create success
+2016-06-04 23:42:09 [133] INFO select http://36.66.129.74:36.66.129.74 as the proxy IP.
+2016-06-04 23:42:09 [133] INFO select http://36.66.129.74:36.66.129.74 as the proxy IP.
+2016-06-04 23:42:09 [136] INFO select Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_8; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50 as the user-agent.
+2016-06-04 23:42:09 [136] INFO select Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_8; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50 as the user-agent.
+2016-06-04 23:56:44 [46] INFO Log create success
+2016-06-04 23:56:45 [134] INFO select http://113.43.125.69:113.43.125.69 as the proxy IP.
+2016-06-04 23:56:45 [134] INFO select http://113.43.125.69:113.43.125.69 as the proxy IP.
+2016-06-04 23:56:45 [137] INFO select Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; 360SE) as the user-agent.
+2016-06-04 23:56:45 [137] INFO select Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; 360SE) as the user-agent.
