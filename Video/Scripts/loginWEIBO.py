@@ -8,7 +8,7 @@ from ClientVideo import ClientVideo
 from PoolManager import PoolManager
 import re
 
-custInfo = ClientVideo(username="txcg777@sina.com",password="xuxu919")
+custInfo = ClientVideo(username="txcg@sina.com",password="xxx")
 pool = PoolManager()
 ipList = pool.ipList()
 userAgent = pool.userAgent()
