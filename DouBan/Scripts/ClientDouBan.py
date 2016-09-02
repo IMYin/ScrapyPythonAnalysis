@@ -74,18 +74,20 @@ class ClientDouBan:
 
     #连接到网络
     def conn(self,url,proxies=None):
-        proxies = self.proxiesPool(self.ipDicts)
-        session = requests.Session()
-        #添加请求头
-        headers = {'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5)AppleWebKit 537.36 (KHTML,like Gecko) Chrome','Connection':'Keep-Alive','Accept-Language':'zh-CN,zh;q=0.8','Accept-Encoding':'gzip,deflate,sdch','Accept':'*/*','Accept-Charset':'GBK,utf-8;q=0.7,*;q=0.3','Cache-Control':'max-age=0'}
-        req = session.get(url,headers=headers,proxies=proxies)
-        bsObj = BeautifulSoup(req.text,"html.parser")
-        if len(bsObj.findAll("li")) < 10:
-	    self.log.info("This is the content of bsObj: \n"+ str(len(bsObj)))
-	    self.log.info("Trying another IP address...")
-            self.conn(url)
-        else:
-            return bsObj
+        for x in range(8):
+            proxies = self.proxiesPool(self.ipDicts)
+            session = requests.Session()
+            #添加请求头
+            headers = {'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5)AppleWebKit 537.36 (KHTML,like Gecko) Chrome','Connection':'Keep-Alive','Accept-Language':'zh-CN,zh;q=0.8','Accept-Encoding':'gzip,deflate,sdch','Accept':'*/*','Accept-Charset':'GBK,utf-8;q=0.7,*;q=0.3','Cache-Control':'max-age=0'}
+            req = session.get(url,headers=headers,proxies=proxies)
+            bsObj = BeautifulSoup(req.text,"html.parser")
+            if len(bsObj.findAll("li")) < 10:
+	            self.log.info("This is the content of bsObj: \n"+ str(bsObj.text)
+	            self.log.info("Trying another IP address...")
+                continue
+            else:
+                break
+        return bsObj
 
 
     #拼出所有的链接地址
