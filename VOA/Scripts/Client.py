@@ -65,32 +65,31 @@ class VoaClient():
         return useragent
 
     def conn(self,url,ipList,userAgent):
-        proxies = {}
-        headers = {}
-        #在代理ip池内随机抽取一个作为代理ip
-        proxies['http'] = ip = random.choice(ipList)
-        self.log.info("select "+proxies['http']+" as the proxy IP.")
-        headers['User-Agent'] = random.choice(userAgent)
-        self.log.info("select "+headers['User-Agent']+" as the user-agent.")
-        session = requests.Session()
-        # 添加请求头
+        for num in range(8):
+            proxies = {}
+            headers = {}
+            #在代理ip池内随机抽取一个作为代理ip
+            proxies['http'] = ip = random.choice(ipList)
+            self.log.info("select "+proxies['http']+" as the proxy IP.")
+            headers['User-Agent'] = random.choice(userAgent)
+            self.log.info("select "+headers['User-Agent']+" as the user-agent.")
+            session = requests.Session()
+            # 添加请求头
 
-        try:
-            req = session.get(url,headers=headers,proxies=proxies)
-            bsObj = BeautifulSoup(req.text,"html.parser",from_encoding='utf-8')
-            ipList.remove(ip)
-            self.log.info("It connected with the url.")
-            return bsObj
-        except ProxyError as e:
-            self.log.warn("The address is not work,it will try again...\n\n"+str(e.message))
-            ipList.remove(ip)
-            self.conn(url,ipList,userAgent)
-            return
-        except ConnectionError as e:
-            self.log.warn("The address is not work,it will try again...\n\n"+str(e.message))
-            ipList.remove(ip)
-            self.conn(url,ipList,userAgent)
-            return 
+            try:
+                req = session.get(url,headers=headers,proxies=proxies)
+                bsObj = BeautifulSoup(req.text,"html.parser",from_encoding='utf-8')
+                self.log.info("It connected with the url.")
+                break
+            except ProxyError as e:
+                self.log.warn("The address is not work,it will try again...\n\n"+str(e.message))
+                ipList.remove(ip)
+                continue
+            except ConnectionError as e:
+                self.log.warn("The address is not work,it will try again...\n\n"+str(e.message))
+                ipList.remove(ip)
+                continue
+        return bsObj
 
     def urls(self,bsObj):
         """"获取所有类别的文章url"""
