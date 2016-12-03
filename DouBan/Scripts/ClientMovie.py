@@ -3,11 +3,16 @@
 download the movie info
 
 """
-from urlparse import urlparse
-from urllib import urlretrieve
-from bs4 import BeautifulSoup
+import csv
+import datetime
+import operator
+import os
+import sys
+import time
+
 import requests
-import os, re, sys, operator, random, datetime, time, csv
+from bs4 import BeautifulSoup
+from urlparse import urlparse
 
 logging_path = os.getenv('LOGGING_PATH')
 sys.path.append(logging_path)
