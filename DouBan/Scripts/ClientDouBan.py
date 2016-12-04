@@ -34,7 +34,7 @@ class ClientDouBan:
                 os.makedirs(log_dir)
             except:
                 pass
-            #        self.ignore_error = ignore_error
+                #        self.ignore_error = ignore_error
         mylog = JobLogging(log_name, log_dir)
         self.log = mylog.get_logger()
         self.log.info("Log create success")
@@ -42,7 +42,7 @@ class ClientDouBan:
         self.ipDicts = self.ipList()
         self.log.info("ipList is done...")
 
-    # 构建代理IP池模板
+        # 构建代理IP池模板
 
 
 def ipList(self):
@@ -90,14 +90,16 @@ def conn(self, url, proxies=None):
         req = session.get(url, headers=headers, proxies=proxies)
         bsObj = BeautifulSoup(req.text, "html.parser")
         if len(bsObj.findAll("li")) < 10:
-            self.log.info("This is the content of bsObj: \n" + str(bsObj.text)
+            self.log.info("This is the content of bsObj: \n" + str(bsObj.text))
             self.log.info("Trying another IP address...")
-        continue
+            continue
         else:
-        break
+            break
 
 
 return bsObj  # 拼出所有的链接地址
+
+
 def toNextPage(self, rawUrl, tag):
     pageNum = [x * 20 for x in range(100)]
     rawUrlNet = urlparse(rawUrl).netloc  # 身
